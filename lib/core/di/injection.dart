@@ -1,23 +1,21 @@
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
+import '../../features/splash/domain/services/splash_service.dart';
+import '../../features/product/data/repositories/product_repository_impl.dart';
+import '../../features/product/domain/repositories/product_repository.dart';
+import '../../features/product/presentation/cubit/product_cubit.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
-
-// BOOKMARK
 import '../../features/bookmark/data/models/bookmark_model.dart';
 import '../../features/bookmark/data/datasources/bookmark_local_datasource.dart';
-
-// CRYPTO
 import '../../features/crypto/data/services/crypto_service.dart';
-
-// SPLASH
-import '../../features/splash/domain/services/splash_service.dart';
+import '../../features/cart/presentation/cubit/cart_cubit.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
   // ======================
-  // DIO
+  // DIO (GLOBAL)
   // ======================
   sl.registerLazySingleton<Dio>(() {
     final dio = Dio();
@@ -34,32 +32,41 @@ Future<void> init() async {
     return dio;
   });
 
-  // ======================
-  // SPLASH
-  // ======================
+  // Splash Service
   sl.registerLazySingleton(() => SplashService());
 
   // ======================
-  // CRYPTO
+  // PRODUCT
   // ======================
+
+  // Repository
+  sl.registerLazySingleton<ProductRepository>(
+    () => ProductRepositoryImpl(sl()),
+  );
+
+  // Cubit
+  sl.registerFactory(
+    () => ProductCubit(sl()),
+  );
+
+  sl.registerFactory(() => CartCubit());
+
   sl.registerLazySingleton(() => CryptoService(sl()));
 
-  // ======================
-  // ISAR (BOOKMARK)
-  // ======================
-  final dir = await getApplicationDocumentsDirectory();
+// ======================
+// ISAR (BOOKMARK)
+// ======================
+final dir = await getApplicationDocumentsDirectory();
 
-  final isar = await Isar.open(
-    [BookmarkModelSchema],
-    directory: dir.path,
-  );
+final isar = await Isar.open(
+  [BookmarkModelSchema],
+  directory: dir.path,
+);
 
-  sl.registerLazySingleton<Isar>(() => isar);
+sl.registerLazySingleton<Isar>(() => isar);
 
-  // ======================
-  // BOOKMARK DATA SOURCE
-  // ======================
-  sl.registerLazySingleton<BookmarkLocalDataSource>(
-    () => BookmarkLocalDataSource(sl()),
-  );
+// datasource
+sl.registerLazySingleton<BookmarkLocalDataSource>(
+  () => BookmarkLocalDataSource(sl()),
+);
 }

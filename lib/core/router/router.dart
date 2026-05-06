@@ -5,6 +5,7 @@ import '../../features/product/presentation/pages/home_page.dart';
 import '../../features/product/presentation/pages/splash_page.dart';
 import '../../features/bookmark/presentation/pages/bookmark_page.dart';
 import '../../features/crypto/presentation/pages/crypto_page.dart';
+import 'package:utd_store_lintang_sari/features/cart/presentation/pages/cart_page.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -31,6 +32,11 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/crypto',
       builder: (context, state) => const CryptoPage(),
+    ),
+
+    GoRoute(
+      path: '/cart',
+      builder: (context, state) => const CartPage(),
     ),
   ],
 );
