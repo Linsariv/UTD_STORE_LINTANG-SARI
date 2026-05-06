@@ -4,9 +4,8 @@ import 'core/di/injection.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await init(); // init DI
-
-  runApp(const MyApp());
+  await init();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
