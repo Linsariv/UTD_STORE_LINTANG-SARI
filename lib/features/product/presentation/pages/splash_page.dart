@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:utd_store_lintang_sari/core/di/injection.dart';
+import 'package:utd_store_lintang_sari/features/splash/domain/services/splash_service.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -17,7 +19,8 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Future<void> start() async {
-    await Future.delayed(const Duration(seconds: 2));
+    final service = sl<SplashService>();
+    await service.startDelay();
 
     if (mounted) {
       context.go('/home');
@@ -29,7 +32,7 @@ class _SplashPageState extends State<SplashPage> {
     return const Scaffold(
       body: Center(
         child: Text(
-          "Lintang\nNIM: XXXXX12",
+          "Lintang\nNIM: 20123012", // ganti sesuai NIM kamu
           textAlign: TextAlign.center,
         ),
       ),
