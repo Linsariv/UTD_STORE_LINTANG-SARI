@@ -17,52 +17,55 @@ class HomePage extends StatelessWidget {
     return BlocProvider(
       create: (_) => sl<ProductCubit>()..fetchProducts(),
       child: Scaffold(
-appBar: AppBar(
-  title: const Text("Product"),
-actions: [
-  IconButton(
-    icon: const Icon(Icons.currency_bitcoin),
-    onPressed: () {
-      context.go('/crypto');
-    },
-  ),
-
-  BlocBuilder<CartCubit, List<CartModel>>(
-    builder: (context, state) {
-      return Stack(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              context.go('/cart');
-            },
-          ),
-          if (state.isNotEmpty)
-            Positioned(
-              right: 0,
-              child: CircleAvatar(
-                radius: 8,
-                backgroundColor: Colors.red,
-                child: Text(
-                  state.length.toString(),
-                  style: const TextStyle(fontSize: 10),
-                ),
-              ),
+        appBar: AppBar(
+          title: const Text("Product"),
+          actions: [
+            // Tombol Crypto
+            IconButton(
+              icon: const Icon(Icons.currency_bitcoin),
+              onPressed: () {
+                context.push('/crypto');  // 👈 GO → PUSH
+              },
             ),
-        ],
-      );
-    },
-  ),
 
+            // Tombol Cart dengan badge
+            BlocBuilder<CartCubit, List<CartModel>>(
+              builder: (context, state) {
+                return Stack(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.shopping_cart),
+                      onPressed: () {
+                        context.push('/cart');  // 👈 GO → PUSH
+                      },
+                    ),
+                    if (state.isNotEmpty)
+                      Positioned(
+                        right: 0,
+                        child: CircleAvatar(
+                          radius: 8,
+                          backgroundColor: Colors.red,
+                          child: Text(
+                            state.length.toString(),
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+
+            // Tombol Battery
             IconButton(
               icon: const Icon(Icons.battery_6_bar),
               onPressed: () {
-                context.go('/battery');
+                context.push('/battery');  // 👈 GO → PUSH
               },
               tooltip: 'Cek Baterai',
             ),
-],
-),
+          ],
+        ),
         body: BlocBuilder<ProductCubit, ProductState>(
           builder: (context, state) {
             if (state is ProductLoading) {
@@ -75,60 +78,57 @@ actions: [
                 itemBuilder: (context, index) {
                   final p = state.products[index];
 
-return Card(
-  margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-  child: Padding(
-    padding: const EdgeInsets.all(10),
-    child: Row(
-      children: [
-        Image.network(
-          p.image,
-          width: 60,
-          height: 60,
-          fit: BoxFit.cover,
-        ),
-
-        const SizedBox(width: 10),
-
-Expanded(
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Text(
-        p.title,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-      ),
-      const SizedBox(height: 5),
-      Text(
-        "Rp ${p.price}",
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-    ],
-  ),
-),
-
-    IconButton(
-      icon: const Icon(Icons.favorite_border),
-      iconSize: 20,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints(),
-      onPressed: () {
-        context.read<CartCubit>().addToCart(
-          CartModel(
-            id: p.id,
-            title: p.title,
-            price: p.price,
-            image: p.image,
-          ),
-            );
-          },
-        ),
-      ],
-    ),
-  ),
-);
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Row(
+                        children: [
+                          Image.network(
+                            p.image,
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  p.title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  "Rp ${p.price}",
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.favorite_border),
+                            iconSize: 20,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: () {
+                              context.read<CartCubit>().addToCart(
+                                CartModel(
+                                  id: p.id,
+                                  title: p.title,
+                                  price: p.price,
+                                  image: p.image,
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
                 },
               );
             }
