@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import '../../domain/models/crypto_model.dart';
+import 'package:utd_store_lintang_sari/features/crypto/domain/services/crypto_tax_service.dart';
 
 class CryptoService {
   final Dio dio;
@@ -20,4 +21,16 @@ Future<List<CryptoModel>> getCrypto() async {
       .map((e) => CryptoModel.fromJson(e as Map<String, dynamic>))
       .toList();
 }
+
+  Future<int> calculateTax() async {
+    // GANTI dengan 2 digit terakhir NIM Anda!
+    // Contoh NIM: 2022001234 → 34
+    final int twoDigitNim = 34; // 👈 GANTI INI!
+    
+    final int loopCount = twoDigitNim * 10000000;
+    
+    final result = await CryptoTaxService.calculateTaxInBackground(loopCount);
+    
+    return result;
+  }
 }

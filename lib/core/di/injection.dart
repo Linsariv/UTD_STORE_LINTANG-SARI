@@ -35,38 +35,38 @@ Future<void> init() async {
   // Splash Service
   sl.registerLazySingleton(() => SplashService());
 
+// Product
+sl.registerLazySingleton<ProductRepository>(
+  () => ProductRepositoryImpl(sl())
+);
+sl.registerFactory<ProductCubit>(
+  () => ProductCubit(sl())
+);
+
   // ======================
-  // PRODUCT
+  // CART
   // ======================
-
-  // Repository
-  sl.registerLazySingleton<ProductRepository>(
-    () => ProductRepositoryImpl(sl()),
-  );
-
-  // Cubit
-  sl.registerFactory(
-    () => ProductCubit(sl()),
-  );
-
   sl.registerFactory(() => CartCubit());
 
+  // ======================
+  // CRYPTO
+  // ======================
   sl.registerLazySingleton(() => CryptoService(sl()));
 
-// ======================
-// ISAR (BOOKMARK)
-// ======================
-final dir = await getApplicationDocumentsDirectory();
+  // ======================
+  // ISAR (BOOKMARK)
+  // ======================
+  final dir = await getApplicationDocumentsDirectory();
 
-final isar = await Isar.open(
-  [BookmarkModelSchema],
-  directory: dir.path,
-);
+  final isar = await Isar.open(
+    [BookmarkModelSchema],
+    directory: dir.path,
+  );
 
-sl.registerLazySingleton<Isar>(() => isar);
+  sl.registerLazySingleton<Isar>(() => isar);
 
-// datasource
-sl.registerLazySingleton<BookmarkLocalDataSource>(
-  () => BookmarkLocalDataSource(sl()),
-);
+  // Datasource
+  sl.registerLazySingleton<BookmarkLocalDataSource>(
+    () => BookmarkLocalDataSource(sl()),
+  );
 }

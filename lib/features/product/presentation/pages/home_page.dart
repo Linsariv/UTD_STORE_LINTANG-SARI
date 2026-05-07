@@ -53,6 +53,14 @@ actions: [
       );
     },
   ),
+
+            IconButton(
+              icon: const Icon(Icons.battery_6_bar),
+              onPressed: () {
+                context.go('/battery');
+              },
+              tooltip: 'Cek Baterai',
+            ),
 ],
 ),
         body: BlocBuilder<ProductCubit, ProductState>(
