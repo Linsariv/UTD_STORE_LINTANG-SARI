@@ -20,28 +20,24 @@ class _BatteryPageState extends State<BatteryPage> {
     try {
       final battery = await BatteryService.getBatteryLevel();
       
-      // ✅ TAMBAHKAN mounted CHECK
       if (!mounted) return;
       
       setState(() {
         _batteryLevel = battery;
       });
 
-      // Tampilkan native toast
       if (battery != -1) {
         await BatteryService.showToast('Baterai tersisa $battery%');
       } else {
         await BatteryService.showToast('Gagal membaca baterai');
       }
     } catch (e) {
-      // ✅ TAMBAHKAN mounted CHECK
       if (!mounted) return;
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
       );
     } finally {
-      // ✅ TAMBAHKAN mounted CHECK
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -50,12 +46,23 @@ class _BatteryPageState extends State<BatteryPage> {
     }
   }
 
+  void _showNameToast() {
+    // Ganti dengan Nama dan NPM Anda
+    BatteryService.showToast('Lintang - 2022001234');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Baterai & Native Toast'),
         backgroundColor: Colors.green,
+        leading: IconButton(  // 👈 TAMBAHKAN INI
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);  // Kembali ke HomePage
+          },
+        ),
       ),
       body: Center(
         child: Padding(
@@ -110,13 +117,28 @@ class _BatteryPageState extends State<BatteryPage> {
               
               const SizedBox(height: 48),
               
-              // Tombol cek baterai
+              // Tombol 1: Cek Baterai
               ElevatedButton.icon(
                 onPressed: _isLoading ? null : _checkBattery,
                 icon: const Icon(Icons.battery_6_bar),
                 label: const Text('Cek Baterai & Tampilkan Toast'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Tombol 2: Toast Nama + NPM
+              ElevatedButton.icon(
+                onPressed: _showNameToast,
+                icon: const Icon(Icons.notifications_active),
+                label: const Text('Tampilkan Toast (Nama + NPM)'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   minimumSize: const Size(double.infinity, 50),

@@ -104,23 +104,28 @@ class _CryptoPageState extends State<CryptoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Crypto Hub"),
-        actions: [
-          // 👈 TOMBOL KALKULASI PAJAK
-          IconButton(
-            icon: isCalculating
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.calculate),
-            onPressed: isCalculating ? null : _calculateTax,
-            tooltip: 'Kalkulasi Pajak Kripto',
-          ),
-        ],
-      ),
+appBar: AppBar(
+  title: const Text("Crypto Hub"),
+  leading: IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () {
+      Navigator.pop(context);  // 👈 KEMBALI KE HOME
+    },
+  ),
+  actions: [
+    IconButton(
+      icon: isCalculating
+          ? const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Icon(Icons.calculate),
+      onPressed: isCalculating ? null : _calculateTax,
+      tooltip: 'Kalkulasi Pajak Kripto',
+    ),
+  ],
+),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
