@@ -1,8 +1,9 @@
 // lib/features/crypto/presentation/pages/crypto_page.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/di/injection.dart';
 import '../../data/services/crypto_service.dart';
-import '../../data/services/bitcoin_websocket.dart'; // 👈 IMPORT BARU
+import '../../data/services/bitcoin_websocket.dart';
 import '../../domain/models/crypto_model.dart';
 
 class CryptoPage extends StatefulWidget {
@@ -16,32 +17,50 @@ class _CryptoPageState extends State<CryptoPage> {
   List<CryptoModel> cryptos = [];
   bool isLoading = true;
   
-  // 👈 VARIABLE BARU UNTUK BITCOIN & ISOLATE
+  // Variable untuk Bitcoin & Isolate
   double bitcoinPrice = 0;
   bool isCalculating = false;
   late BitcoinWebSocketService _webSocket;
+  
+  // Timer untuk fallback polling
+  Timer? _timer;
 
-  @override
-  void initState() {
-    super.initState();
-    fetchCrypto();
-    
-    // 👈 INISIALISASI WEBSOCKET BITCOIN
-    _webSocket = BitcoinWebSocketService();
-    _webSocket.connect((price) {
-      if (mounted) {
+@override
+void initState() {
+  super.initState();
+  fetchCrypto();
+  
+  // WebSocket Bitcoin
+  _webSocket = BitcoinWebSocketService();
+  _webSocket.connect((price) {
+    if (mounted) {
+      setState(() {
+        bitcoinPrice = price;
+      });
+    }
+  });
+  
+  // FALLBACK: Polling REST API setiap 3 detik (jika WebSocket gagal)
+  _timer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+    try {
+      final price = await sl<CryptoService>().getBitcoinPrice();
+      if (mounted && price > 0) {
         setState(() {
           bitcoinPrice = price;
         });
       }
-    });
-  }
+    } catch (e) {
+      print('Polling error: $e');
+    }
+  });
+}
 
-  @override
-  void dispose() {
-    _webSocket.disconnect(); // 👈 CLOSE WEBSOCKET
-    super.dispose();
-  }
+@override
+void dispose() {
+  _webSocket.disconnect();
+  _timer?.cancel();
+  super.dispose();
+}
 
   Future<void> fetchCrypto() async {
     final data = await sl<CryptoService>().getCrypto();
@@ -53,7 +72,7 @@ class _CryptoPageState extends State<CryptoPage> {
     }
   }
 
-  // 👈 FUNGSI UNTUK KALKULASI PAJAK DENGAN ISOLATE
+  // Fungsi untuk kalkulasi pajak dengan Isolate
   Future<void> _calculateTax() async {
     setState(() {
       isCalculating = true;
@@ -104,33 +123,33 @@ class _CryptoPageState extends State<CryptoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-appBar: AppBar(
-  title: const Text("Crypto Hub"),
-  leading: IconButton(
-    icon: const Icon(Icons.arrow_back),
-    onPressed: () {
-      Navigator.pop(context);  // 👈 KEMBALI KE HOME
-    },
-  ),
-  actions: [
-    IconButton(
-      icon: isCalculating
-          ? const SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          : const Icon(Icons.calculate),
-      onPressed: isCalculating ? null : _calculateTax,
-      tooltip: 'Kalkulasi Pajak Kripto',
-    ),
-  ],
-),
+      appBar: AppBar(
+        title: const Text("Crypto Hub"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Kembali ke Home
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: isCalculating
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.calculate),
+            onPressed: isCalculating ? null : _calculateTax,
+            tooltip: 'Kalkulasi Pajak Kripto',
+          ),
+        ],
+      ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                // 👈 CARD HARGA BITCOIN REAL-TIME
+                // Card Harga Bitcoin Real-time
                 Container(
                   margin: const EdgeInsets.all(16),
                   padding: const EdgeInsets.all(16),
@@ -144,7 +163,7 @@ appBar: AppBar(
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.orange.withAlpha(77),  // 0.3 * 255 = 76.5 ≈ 77
+                        color: Colors.orange.withAlpha(77),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -185,7 +204,7 @@ appBar: AppBar(
                   ),
                 ),
                 
-                // 👈 LIST CRYPTO LAINNYA
+                // List Crypto Lainnya
                 Expanded(
                   child: ListView.builder(
                     itemCount: cryptos.length,

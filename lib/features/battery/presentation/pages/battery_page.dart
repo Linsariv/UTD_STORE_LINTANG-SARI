@@ -48,7 +48,7 @@ class _BatteryPageState extends State<BatteryPage> {
 
   void _showNameToast() {
     // Ganti dengan Nama dan NPM Anda
-    BatteryService.showToast('Lintang - 2022001234');
+    BatteryService.showToast('Lintang - 20123012');
   }
 
   @override
@@ -136,7 +136,7 @@ class _BatteryPageState extends State<BatteryPage> {
               ElevatedButton.icon(
                 onPressed: _showNameToast,
                 icon: const Icon(Icons.notifications_active),
-                label: const Text('Tampilkan Toast (Nama + NPM)'),
+                label: const Text('Tampilkan Toast'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
                   foregroundColor: Colors.white,

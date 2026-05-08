@@ -1,21 +1,40 @@
-// lib/features/crypto/data/services/bitcoin_websocket.dart
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:convert';
 
 class BitcoinWebSocketService {
-  static const String _wsUrl = 'wss://ws.coincap.io/prices?assets=bitcoin';
+  // GANTI URL ke Binance (lebih stabil)
+  static const String _wsUrl = 'wss://stream.binance.com:9443/ws/btcusdt@trade';
   WebSocketChannel? _channel;
   
   void connect(Function(double price) onPriceReceived) {
-    _channel = WebSocketChannel.connect(Uri.parse(_wsUrl));
-    
-    _channel!.stream.listen((message) {
-      final data = jsonDecode(message);
-      if (data['bitcoin'] != null) {
-        final price = double.parse(data['bitcoin'].toString());
-        onPriceReceived(price);
-      }
-    });
+    try {
+      print('Connecting to Binance WebSocket...');
+      
+      _channel = WebSocketChannel.connect(Uri.parse(_wsUrl));
+      
+      _channel!.stream.listen(
+        (message) {
+          print('Raw message: $message');
+          
+          final data = jsonDecode(message);
+          
+          // Binance format: {"p":"79622.00", ...}
+          if (data['p'] != null) {
+            final price = double.parse(data['p'].toString());
+            print('Bitcoin price (Binance): $price');
+            onPriceReceived(price);
+          }
+        },
+        onError: (error) {
+          print('WebSocket error: $error');
+        },
+        onDone: () {
+          print('WebSocket disconnected');
+        },
+      );
+    } catch (e) {
+      print('Connection error: $e');
+    }
   }
   
   void disconnect() {
